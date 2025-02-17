@@ -3363,7 +3363,6 @@ class Formula
     # ]
     # ```
     #
-    # @!attribute [w] license
     # @see https://docs.brew.sh/License-Guidelines Homebrew License Guidelines
     # @see https://spdx.github.io/spdx-spec/latest/annexes/spdx-license-expressions/ SPDX license expression guide
     # @api public
@@ -3585,12 +3584,10 @@ class Formula
     #     revision: "db8e4de5b2d6653f66aea53094624468caad15d2"
     # ```
     #
-    # @!attribute [w] url
     # @api public
     sig { params(val: String, specs: T::Hash[Symbol, T.any(String, Symbol)]).void }
     def url(val, specs = {}) = stable.url(val, specs)
 
-    # @!attribute [w] version
     # The version string for the {.stable} version of the formula.
     # The version is autodetected from the URL and/or tag so only needs to be
     # declared if it cannot be autodetected correctly.
@@ -3602,10 +3599,9 @@ class Formula
     # ```
     #
     # @api public
-    sig { params(val: T.nilable(String)).void }
+    sig { params(val: T.nilable(String)).returns(T.nilable(Version)) }
     def version(val = nil) = stable.version(val)
 
-    # @!attribute [w] mirror
     # Additional URLs for the {.stable} version of the formula.
     # These are only used if the {.url} fails to download. It's optional and
     # there can be more than one. Generally we add them when the main {.url}
@@ -3623,7 +3619,6 @@ class Formula
     sig { params(val: String).void }
     def mirror(val) = stable.mirror(val)
 
-    # @!attribute [w] sha256
     # @scope class
     # To verify the cached download's integrity and security we verify the
     # SHA-256 hash matches what we've declared in the {Formula}. To quickly fill
@@ -3680,7 +3675,6 @@ class Formula
       mod.const_get(:BUILD_FLAGS)
     end
 
-    # @!attribute [w] stable
     # Allows adding {.depends_on} and {Patch}es just to the {.stable} {SoftwareSpec}.
     # This is required instead of using a conditional.
     # It is preferable to also pull the {url} and {sha256= sha256} into the block if one is added.
@@ -3836,7 +3830,7 @@ class Formula
     # ```
     #
     # @api public
-    sig { params(dep: T.any(String, Symbol, T::Hash[String, T.untyped])).void }
+    sig { params(dep: T.any(String, Symbol, T::Hash[String, T.untyped], T::Class[Requirement])).void }
     def depends_on(dep)
       specs.each { |spec| spec.depends_on(dep) }
     end
@@ -3857,7 +3851,6 @@ class Formula
       specs.each { |spec| spec.uses_from_macos(dep, bounds) }
     end
 
-    # @!attribute [w] option
     # Options can be used as arguments to `brew install`.
     # To switch features on/off: `"with-something"` or `"with-otherthing"`.
     # To use other software: `"with-other-software"` or `"without-foo"`.
@@ -3889,7 +3882,6 @@ class Formula
       specs.each { |spec| spec.option(name, description) }
     end
 
-    # @!attribute [w] deprecated_option
     # Deprecated options are used to rename options and migrate users who used
     # them to newer ones. They are mostly used for migrating non-`with` options
     # (e.g. `enable-debug`) to `with` options (e.g. `with-debug`).
@@ -4072,7 +4064,7 @@ class Formula
     # ```
     #
     # @api public
-    sig { params(compiler: T.any(Symbol, T::Hash[Symbol, String]), block: T.proc.void).void }
+    sig { params(compiler: T.any(Symbol, T::Hash[Symbol, String]), block: T.nilable(T.proc.void)).void }
     def fails_with(compiler, &block)
       specs.each { |spec| spec.fails_with(compiler, &block) }
     end
@@ -4148,7 +4140,6 @@ class Formula
     # end
     # ```
     #
-    # @!attribute [w] livecheck
     # @api public
     sig { params(block: T.nilable(T.proc.bind(Livecheck).returns(T.untyped))).returns(T.untyped) }
     def livecheck(&block)
@@ -4171,7 +4162,6 @@ class Formula
     # end
     # ```
     #
-    # @!attribute [w] service
     # @api public
     sig { params(block: T.nilable(T.proc.returns(T.untyped))).returns(T.nilable(T.proc.returns(T.untyped))) }
     def service(&block)
@@ -4209,7 +4199,7 @@ class Formula
       params(
         only_if: T.nilable(Symbol),
         block:   T.nilable(T.proc.params(arg0: T.untyped).returns(T.any(T::Boolean, Symbol))),
-      ).returns(T.any(T::Boolean, Symbol))
+      ).void
     }
     def pour_bottle?(only_if: nil, &block)
       @pour_bottle_check = T.let(PourBottleCheck.new(self), T.nilable(PourBottleCheck))
