@@ -179,13 +179,11 @@ class Livecheck
   def url(url = T.unsafe(nil), homebrew_curl: nil, post_form: nil, post_json: nil)
     raise ArgumentError, "Only use `post_form` or `post_json`, not both" if post_form && post_json
 
-    if homebrew_curl || post_form || post_json
-      @options = @options.merge({
-        homebrew_curl:,
-        post_form:,
-        post_json:,
-      }.compact)
-    end
+    @options.merge!({
+      homebrew_curl:,
+      post_form:,
+      post_json:,
+    }.compact)
 
     case url
     when nil
